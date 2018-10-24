@@ -1,0 +1,148 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<script>
+
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+    
+    function initStockTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'MATNR',
+                title: '자재코드',
+                sortable: true,
+            }, {
+                field: 'MAKTX',
+                title: '내역',
+                sortable: true,
+            }, {
+                field: 'AMENG',
+                title: '가용수량',
+                formatter:"commaFormatter",
+                sortable: true,
+            },{
+                field: 'MEINS',
+                title: '단위',
+                sortable: true,
+            }]
+        });
+    }
+
+    function displayStockData(stockList) {
+        $('#stockTable').bootstrapTable("load", stockList);
+    }
+    
+    $(function() {
+
+        var $stockTable = $('#stockTable');
+        
+        initStockTable($stockTable);
+
+        $('#search').click(function(event) {
+            event.preventDefault();
+            if ($('#matDesc').val() == '' && $('#matSize').val() == '') {
+                alert('조회 정보를 입력해야합니다');
+                return false;
+            };
+            
+            var data = new FormData($('#getCurrentStock').get(0));
+
+            $.blockUI({ 
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur();
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/currentStock/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        var parsed = JSON.parse(response);
+                        displayStockData(parsed);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+    });
+</script>
+<div class="container">
+    <div class="row">
+        <form action = "/getCurrentStock/" method="post" id="getCurrentStock">{% csrf_token %}
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="matDesc">자재&nbsp;내역</label>
+                    <input type="text" class="form-control" id="matDesc" name="matDesc" placeholder="자재내역">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="matSize">크기/치수</label>
+                    <input type="text" class="form-control" id="matSize" name="matSize" placeholder="크기치수">
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="plant">플랜트</label>
+                    <select class="form-control" name="plant" id="plant">
+                        <option selected="selected" value='1411'>1411-산업기계팀 본사</option>
+                        <option value='1412'>1412-산업기계팀 영남</option>
+                        <option value='1408'>1408-금속2팀 본사</option>
+                        <option value='1409'>1409-금속2팀 영남</option>
+                        <option value='1424'>1424-건자재팀</option>
+                        <option value='1425'>1425-합성수지팀</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="storageLocation">저장위치</label>
+                    <select class="form-control" name="storageLocation" id="storageLocation">
+                        <option selected="selected" value='1000'>1000-기본창고</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="search">　</label>
+                    <button type="submit" class="btn btn-primary btn-block" id="search" name="search">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table id="stockTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+<script src="http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+
+<script>
+
+    function displayExchangeRateData(list) {
+
+        var label = [];
+        var values  = [];
+
+        for(var i=0; i<list.length; i++) {
+            label.push(list[i]['SDATE']);
+            values.push(list[i]['TRADST']);
+        }
+
+        var data = {
+            labels : label,
+            series : [
+                values
+            ]
+        };
+
+        var options = {
+            // width: '300px',
+            height: '300px',
+            showArea: true
+        };
+
+        var responsiveOptions = [
+          ['screen and (min-width: 641px) and (max-width: 1024px)', {
+            showPoint: false,
+            axisX: {
+              labelInterpolationFnc: function(value) {
+                // Will return Mon, Tue, Wed etc. on medium screens
+                return value.slice(0, 3);
+              }
+            }
+          }],
+          ['screen and (max-width: 640px)', {
+            showLine: false,
+            axisX: {
+              labelInterpolationFnc: function(value) {
+                // Will return M, T, W etc. on small screens
+                return value[0];
+              }
+            }
+          }]
+        ];
+
+        new Chartist.Line('.ct-chart', data, options, responsiveOptions);
+
+    }    
+    $(function() {
+
+        $('#search').click(function(event) {
+            event.preventDefault();
+            
+            var data = new FormData($('#getCurrentStock').get(0));
+
+            // $.blockUI({ 
+            //     message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+            //     css : {
+            //         backgroundColor : 'rgba(0,0,0,0.0)',
+            //         color : '#000000',
+            //         border: '0px solid #a00'
+            //     }
+            // });
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/exchangeRate/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        var parsed = JSON.parse(response);
+                        displayExchangeRateData(parsed);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+            
+    });
+</script>
+<div class="container">
+    <div class="row">
+        <form action = "/getCurrentStock/" method="post" id="getCurrentStock">{% csrf_token %}
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="stdCurrency">기준환율</label>
+                    <input type="text" class="form-control" id="stdCurrency" name="stdCurrency" placeholder="기준환율" value="KRW" disabled>
+                </div>
+            </div>
+            
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="displayCurrency">조회환율</label>
+                    <select class="form-control" name="displayCurrency" id="displayCurrency">
+                        <option selected="selected" value='USD'>USD</option>
+                        <option value='EUR'>EUR</option>
+                        <option value='JPY'>JPY</option>
+                        <option value='GBP'>GBP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="pastMonths">조회환율</label>
+                    <select class="form-control" name="pastMonths" id="pastMonths">
+                        <option selected="selected" value='1'>1개월치</option>
+                        <option value='3'>3개월치</option>
+                        <option value='6'>6개월치</option>
+                        <option value='12'>1년치</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="search">　</label>
+                    <button type="submit" class="btn btn-primary btn-block" id="search" name="search">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table id="stockTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+
+    <div class='ct-chart'></div>
+</div>
+{% endblock %}

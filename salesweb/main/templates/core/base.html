@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% load static %}
+
+  <link rel="stylesheet" src="{% static 'css/int/common.css' %}">
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="{% static 'js/ext/jquery.1.12.0.min.js' %}"></script>
+  <script src="{% static 'js/ext/bootstrap.3.3.6.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'js/ext/jquery.blockUI.js' %}"></script>
+
+  <!-- bootstrap table -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/2.1.0/bootstrap-filestyle.min.js"></script>
+  <script src="{% static 'js/ext/bootstrap-table-export.js' %}"></script>
+  <script src="{% static 'js/ext/tableExport.js' %}"></script>
+  <script src="{% static 'js/ext/bootstrap-table-editable.js' %}"></script>
+  <script src="{% static 'js/ext/bootstrap-editable.js' %}"></script>
+  <script src="{% static 'js/ext/bootstrap-table-mobile.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/ext/bootstrap-editable.css' %}">
+
+
+  <style>
+    #headerLogo{max-width: 90px; height: auto; text-align: left;}
+    table thead tr th {background-color: #F6F6F6;}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'main:home' %}">
+        <img id="headerLogo" src="{% static 'img/logo/tradeci.png' %}"/>
+      </a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-th"></span> Training<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/trainModel">Model Train</a></li>
+            <li><a href="/manageModel">Model Manage</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-stats"></span> Test<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/testModel">Model Test</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span> Admin<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/configuration">Configuration</a></li>
+          </ul>
+        </li>
+
+        <li><a href="{% url 'main:home' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>

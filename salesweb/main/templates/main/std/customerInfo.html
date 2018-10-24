@@ -1,0 +1,144 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<script>
+    
+    function initCustomerTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'KUNNR',
+                title: '고객',
+                sortable: true,
+            }, {
+                field: 'KUNNR_T',
+                title: '고객명',
+                sortable: true,
+            }, {
+                field: 'STCD2',
+                title: '사업자번호',
+                sortable: true,
+            },{
+                field: 'J_1KFREPRE',
+                title: '대표',
+                sortable: true,
+            },{
+                field: 'J_1KFTBUS',
+                title: '업종',
+                sortable: true,
+            },{
+                field: 'J_1KFTIND',
+                title: '업태',
+                sortable: true,
+            },{
+                field: 'ORT01',
+                title: '주소1',
+                sortable: true,
+            },{
+                field: 'STRAS',
+                title: '주소2',
+                sortable: true,
+            }]
+        });
+    }
+
+    function displayCustomerData(customerList) {
+        $('#customerTable').bootstrapTable("load", customerList);
+    }
+
+    $(function() {
+        var $customerTable = $('#customerTable');
+        initCustomerTable($customerTable);
+
+        $('#search').click(function(event) {
+            event.preventDefault();
+            if ($('#cusName').val() == '') {
+                $("#customerList").html(htmlTag);
+                alert('고객명은 필수입니다');
+                return false;
+            };
+
+            var data = new FormData($('#getCustomerInfo').get(0));
+
+            $.blockUI({
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur(); // 모바일 기기 키보드 숨김.
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/customerInfo/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        var parsed = JSON.parse(response);
+                        displayCustomerData(parsed);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+});
+</script>
+<div class="container">
+    <div class="row">
+        <form action = "/getCustomerInfo/" method="post" id="getCustomerInfo">{% csrf_token %}
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="cusName">고객명</label>
+                    <input type="text" class="form-control" id="cusName" name="cusName" placeholder="고객명">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="represent">대표자</label>
+                    <input type="text" class="form-control" id="represent" name="represent" placeholder="대표자">
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="plant">플랜트</label>
+                    <select class="form-control" name="plant" id="plant">
+                        <option selected="selected" value='1411'>1411-산업기계팀 본사</option>
+                        <option value='1412'>1412-산업기계팀 영남</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="search">　</label>
+                    <button type="submit" class="btn btn-primary btn-block" id="search" name="search">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <table id="customerTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+</div>
+{% endblock %}

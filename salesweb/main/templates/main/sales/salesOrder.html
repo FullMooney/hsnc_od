@@ -1,0 +1,507 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- <script type="text/javascript" src="https://rawgit.com/mindmup/editable-table/master/mindmup-editabletable.js"></script> -->
+
+<script>
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+
+    function displayStockData(stockList) {
+        for(var i=0; i<stockList.length; i++) {
+            stockList[i]['OMENG'] = 0;
+        }
+        $('#stockTable').bootstrapTable("load", stockList);
+    }
+
+    function displayCustomerData(customerList) {
+        $('#customerTable').bootstrapTable("load", customerList);
+    }
+
+    function clearScreen() {
+        var $stockTable = $('#stockTable');
+        var $orderTable = $('#orderTable');
+
+        $stockTable.bootstrapTable('removeAll');
+        $orderTable.bootstrapTable('removeAll');
+    }
+
+    function initCustomerTable(table){
+        table.bootstrapTable({
+            columns: [{
+                field: 'STATE',
+                radio: true,
+            }, {
+                field: 'KUNNR',
+                title: '고객'
+            }, {
+                field: 'KUNNR_T',
+                title: '고객명',
+            }, {
+                field: 'STCD2',
+                title: '사업자번호',
+            },{
+                field: 'J_1KFREPRE',
+                title: '대표',
+            }]
+        });
+    }
+
+    function initStockTable(table){
+        table.bootstrapTable({
+            columns: [{
+                field: 'STATE',
+                checkbox: true,
+            }, {
+                field: 'MATNR',
+                title: '자재코드',
+                sortable: true,
+            }, {
+                field: 'MAKTX',
+                title: '내역',
+                sortable: true,
+            }, {
+                field: 'AMENG',
+                title: '가용수량',
+                formatter:"commaFormatter",
+                sortable: true,
+            },{
+                field: 'MEINS',
+                title: '단위',
+                sortable: true,
+            }]
+        });
+    }
+
+    function initOrderTable(table){
+        table.bootstrapTable({
+            columns: [{
+                field: 'STATE',
+                checkbox: true,
+            }, {
+                field: 'MATNR',
+                title: '자재코드'
+            }, {
+                field: 'MAKTX',
+                title: '내역',
+            }, {
+                field: 'AMENG',
+                title: '가용수량',
+                formatter:"commaFormatter",
+            },{
+                field:'OMENG',
+                title:'주문수량',
+                editable: {
+                    type: 'text',
+                    validate: function (value) {
+                                value = $.trim(value);
+                                var data = table.bootstrapTable('getData'),
+                                    index = $(this).parents('tr').data('index');
+
+                                var ameng = data[index]['AMENG']
+
+                                if (value > ameng) {
+                                    return '가용수량을 초과합니다';
+                                }
+                                return '';
+                            }
+                }
+            },{
+                field: 'MEINS',
+                title: '단위',
+            }],
+            // onPostBody: function () {
+            //     table.editableTableWidget({editor: $('<textarea>')});
+            // }
+        });
+    }
+
+    function getSelections(table) {
+        return $.map(table.bootstrapTable('getSelections'), function (row) {
+            return row
+        });
+    }
+    
+    $(function() {
+
+        var $stockTable = $('#stockTable');
+        var $orderTable = $('#orderTable');
+        var $customerTable = $('#customerTable');
+
+        initStockTable($stockTable);
+        initOrderTable($orderTable);
+        initCustomerTable($customerTable);
+
+        $('#toolbar').find('select').change(function () {
+            $stockTable.bootstrapTable('destroy').bootstrapTable({
+                exportDataType: $(this).val()
+            });
+        });
+
+        $orderTable.on('click-cell.bs.table', function(e, field, value, row, $element ) {
+            // console.log(field, value, row, $element);
+            // if( field == "OMENG") {
+            //     console.log($element)
+            // }
+        });
+
+        $('#addToOrder').click(function () {
+            var stock      = $stockTable.bootstrapTable('getSelections');
+            var orderStock = $orderTable.bootstrapTable('getData');
+
+            for(var i=0; i<stock.length; i++) {
+                stock[i]["STATE"] = false;
+                stock[i]["OMENG"] = '';
+                for(var j=0; j<orderStock.length; j++) {
+                    if(stock[i]["MATNR"] == orderStock[j]["MATNR"]) {
+                        alert("동일한 자재가 존재합니다 - " + stock[i]["MATNR"]);
+                        return false;
+                    }
+                }
+            }
+
+            $('#orderTable').bootstrapTable("append", stock);
+            orderStock = $orderTable.bootstrapTable('getData');
+
+            for(var i=0; i<orderStock.length; i++) {
+                orderStock[i]["STATE"] = false;
+            }
+        });
+
+        $('#removeOrderStock').click(function () {
+            var ids = $.map($orderTable.bootstrapTable('getSelections'), function (row) {
+                return row.MATNR;
+            });
+
+            $('#orderTable').bootstrapTable('remove', {
+                field: 'MATNR',
+                values: ids
+            });
+        });
+
+        $('#createSalesOrder').click(function(event) {
+
+            var salesGrp    = $('#salesGrp').val();
+            var plant       = $('#plant').val();
+            var storageLoc  = $('#storageLocation').val();
+            var customer    = $('#customer').val();
+            var terms       = $('#terms').val();
+            var ref         = $('#ref').val();
+            var orderItem   = $orderTable.bootstrapTable('getData');
+            var orderStock  = JSON.stringify(orderItem);
+
+            if(plant == "" || storageLoc == "" || customer == "" || terms == "" || orderItem.length == 0) {
+                alert("필수 정보가 입력되지 않았습니다");
+                return false;
+            }
+
+            for (var i=0; i<orderItem.length; i++) {
+                if (orderItem[i]["OMENG"] == "" || orderItem[i]['OMENG'] == 0) {
+                    alert("주문수량은 0을 입력할 수 없습니다");
+                    return false;
+                }
+            }
+                
+
+            if (confirm("판매오더를 생성 하시겠습니까?") == false) {
+                return false;
+            }
+
+            $.blockUI({ 
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur(); // 모바일 기기 키보드 숨김.
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/salesOrder/',
+                    data : {
+                        salesGrp : salesGrp,
+                        plant : plant,
+                        storageLoc : storageLoc,
+                        customer : customer,
+                        terms : terms,
+                        ref : ref,
+                        orderStock : orderStock,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    }
+                    }).done(function(response) {
+                        alert(response);
+                        clearScreen();
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+
+        });
+
+        $('#search').click(function(event) {
+            event.preventDefault();
+            if ($('#matDesc').val() == '' && $('#matSize').val() == '') {
+                alert('조회 정보를 입력해야합니다');
+                return false;
+            };
+            
+            var data = new FormData($('#getCurrentStock').get(0));
+
+            $.blockUI({ 
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur(); // 모바일 기기 키보드 숨김.
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/currentStock/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        stockList = JSON.parse(response);
+                        displayStockData(stockList);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+
+        $('#customerSearch').click(function(event) {
+            event.preventDefault();
+            if ($('#cusName').val() == '') {
+                $("#customerList").html(htmlTag);
+                alert('고객명은 필수입니다');
+                return false;
+            };
+
+            var data = new FormData($('#getCustomerInfo').get(0));
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/customerInfo/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        var customerList = JSON.parse(response);
+                        displayCustomerData(customerList);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+
+        $('#closeCustomerModal').click(function(event) {
+            $('#customerTable').bootstrapTable('removeAll');
+            $('#cusName').val('');
+            $('#J_1KFREPRE').val('');
+        });
+
+        $('#finishCustomerModal').click(function(event) {
+            var customer = $('#customerTable').bootstrapTable('getSelections');
+            $('#customer').val(customer[0]['KUNNR']);
+            $('#closeCustomerModal').trigger('click');
+        });
+});
+</script>
+<div class="container">
+    <div class="row">
+        <form action = "/getCurrentStock/" method="post" id="getCurrentStock">{% csrf_token %}
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="matDesc">자재내역</label>
+                    <input type="text" class="form-control" id="matDesc" name="matDesc" placeholder="자재내역">
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="matSize">크기/치수</label>
+                    <input type="text" class="form-control" id="matSize" name="matSize" placeholder="크기치수">
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="salesGrp">영업그룹</label>
+                    <select class="form-control" name="salesGrp" id="salesGrp">
+                        <option selected="selected" value='18Q'>18Q-베어링조(본사)</option>
+                        <option value='18S'>18S-유공압조(본사)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="plant">플랜트</label>
+                    <select class="form-control" name="plant" id="plant">
+                        <option selected="selected" value='1411'>1411-산업기계팀 본사</option>
+                        <option value='1412'>1412-산업기계팀 영남</option>
+                        <option value='1408'>1408-금속2팀 본사</option>
+                        <option value='1409'>1409-금속2팀 영남</option>
+                        <option value='1424'>1424-건자재팀</option>
+                        <option value='1425'>1425-합성수지팀</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="storageLocation">저장위치</label>
+                    <select class="form-control" name="storageLocation" id="storageLocation">
+                        <option selected="selected" value='1000'>1000-기본창고</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="search">　</label>
+                    <button type="submit" class="btn btn-primary btn-block" id="search" name="search">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="toolbar">
+        <button id="addToOrder" class="btn btn-default">
+            <i class="glyphicon glyphicon-plus"></i> Add
+        </button>
+    </div>
+
+    <table id="stockTable"
+        data-height="250"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+
+    <div id="toolbar2">
+        <h3>Order Items</h3>
+        <div class="form-inline" role="form">
+            <div class="form-group">
+                <button id="removeOrderStock" class="btn btn-default">
+                    <i class="glyphicon glyphicon-remove"></i> Remove
+                </button>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="customer" name="customer" placeholder="고객" disabled>
+                    <div class="input-group-btn">
+                      <button class="btn btn-default" type="button" data-toggle="modal" data-target="#getCustomer">
+                        <i class="glyphicon glyphicon-search"></i>
+                      </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <select class="form-control" name="terms" id="terms">
+                        <option selected="selected" value='2131'>2131-익월말현금</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="ref" name="ref" placeholder="참고사항">
+                </div>
+            </div>
+            <div class="form-group">
+                <button id="createSalesOrder" class="btn btn-primary btn-block">
+                    오더생성
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <table id="orderTable"
+        data-search="false"
+        data-toolbar="#toolbar2"
+        class='table table-hover'
+        data-unique-id='MATNR'
+        data-showFooter="true"
+        data-mobile-responsive="true"
+        data-click-to-select="true">
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="getCustomer" role="dialog">
+      <div class="modal-dialog">
+      
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">고객조회</h4>
+          </div>
+          <div class="modal-body">
+            <form action = "/getCustomerInfo/" method="post" id="getCustomerInfo">{% csrf_token %}
+                <div class="form-group">
+                    <input type="text" class="form-control" id="cusName" name="cusName" placeholder="고객명">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="represent" name="represent" placeholder="대표자명">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="plant" id="plant">
+                        <option selected="selected" value='1411'>1411-산업기계팀 본사</option>
+                        <option value='1412'>1412-산업기계팀 영남</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block" id="customerSearch" name="search">조회</button>
+                </div>
+            </form>
+            <table id="customerTable"
+                class='table table-hover'
+                data-height="250"
+                data-unique-id='KUNNR'
+                data-click-to-select="true">
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" name="modifyGamePoster" id="finishCustomerModal">완료</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="closeCustomerModal">취소</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    
+
+</div>
+{% endblock %}

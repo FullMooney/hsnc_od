@@ -1,0 +1,196 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<script>
+    
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+    
+    function initFileTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'filename',
+                title: 'File',
+                sortable: true,
+            }, {
+                field: 'label',
+                title: 'Label',
+                sortable: true,
+            }]
+        });
+    }
+
+    function displayFileData(fileList) {
+        $('#fileTable').bootstrapTable("load", fileList);
+    }
+    
+    $(function() {
+        
+        var aJsonArray = new Array();
+        var formData = new FormData(document.getElementById('trainDataForm'));
+        var $fileTable = $('#fileTable');
+        initFileTable($fileTable);
+        
+        $(document).on('click', '.browse', function(){
+          var file = $(this).parent().parent().parent().find('.file');
+          file.trigger('click');;
+        });
+        
+        $(document).on('change', '.file', function(){
+          var x = document.getElementById('files');
+          var inputText = '파일 ' + x.files.length + '개 선택';
+          for(var i=0; i<x.files.length; i++) {
+              var file = x.files[i];
+          }
+          //$(this).parent().find('#imageText').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+          $(this).parent().find('#imageText').val(inputText);
+        });
+        
+        $('#addToList').click(function(event) {
+            event.preventDefault();
+            
+            var x = document.getElementById('files');
+            
+            if ($('#trainLabel').val() == '' || x.files.length == 0) {
+                alert('Image와 Label이 모두 입력되어야 합니다');
+                return false;
+            };
+
+            for(var i=0; i<x.files.length; i++) {
+                var aJson = new Object();
+                var file = x.files[i];
+                
+                aJson.filename = file.name;
+                aJson.label = $('#trainLabel').val()
+                aJsonArray.push(aJson);
+                
+                formData.append('files', file);
+                formData.append('labels', $('#trainLabel').val());
+            };
+            console.log(formData.getAll('files'));
+            console.log(formData.getAll('labels'));
+            displayFileData(aJsonArray);
+        });
+        
+        $('#trainModel').click(function(event) {
+            event.preventDefault();
+            if (formData.getAll('files').length <= 1) {
+                alert('Train dataset 이 없습니다');
+                return false;
+            };
+            
+            console.log(formData.getAll('files'));
+            console.log(formData.getAll('labels'));
+            
+            $.blockUI({ 
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur();
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/trainModel/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : formData,
+                    }).done(function(response) {
+                        //var parsed = JSON.parse(response);
+                        alert(response);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+    });
+    
+    
+
+</script>
+<style>
+.file {
+  visibility: hidden;
+  position: absolute;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <form action = "/trainDataForm/" method="post" id="trainDataForm" enctype="multipart/form-data">{% csrf_token %}
+            <div class="col-sm-4">                
+                <div class="form-group">
+                    <label for="trainImage">Images</label>
+                    <input type="file" name="files" id="files" class="file" multiple>
+                    <input type="hidden" name="labels" id="labels">
+                        <div class="input-group col-xs-12">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-picture"></i></span>
+                            <input type="text" class="form-control" disabled placeholder="Upload Image" id="imageText">
+                            <span class="input-group-btn">
+                                <button class="browse btn btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                            </span>
+                        </div>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="trainLabel">Label</label>
+                    <input type="text" class="form-control" id="trainLabel" name="trainLabel" placeholder="Label">
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="method">Method</label>
+                    <select class="form-control" name="method" id="method">
+                        <option selected="selected" value='SSD'>SSD Mobilenet</option>
+                        <option value='FRCNN'>F-RCNN</option>
+                        <option value='YOLOV2'>YOLO v2</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="addToList">　</label>
+                    <button type="submit" class="btn btn-warning btn-block" id="addToList" name="addToList">Add To List</button>
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="trainModel">　</label>
+                    <button type="button" class="btn btn-danger btn-block" id="trainModel" name="trainModel">Train Model</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table id="fileTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+    /*#qty{text-align:right;}*/
+</style>
+<script>
+    function initPriceTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'ZZCLASS1X',
+                title: '브랜드',
+                sortable: true,
+            }, {
+                field: 'MFRPN',
+                title: '형번',
+                sortable: true,
+            }, {
+                field: 'ZZCLASS2X',
+                title: '품목군',
+                sortable: true,
+            },{
+                field: 'MAKTX',
+                title: '자재내역',
+                sortable: true,
+            },{
+                field: 'KMEIN',
+                title: '단위',
+                sortable: true,
+            },{
+                field: 'UMREZ',
+                title: '1BOX',
+                sortable: true,
+            },{
+                field: 'KBETR',
+                title: '기준가격',
+                sortable: true,
+            },{
+                field: 'MATNR',
+                title: '자재',
+                sortable: true,
+            }]
+        });
+    }
+
+    function displayPriceData(priceList) {
+        $('#priceTable').bootstrapTable("load", priceList);
+    }
+
+    $(function() {
+
+        var $priceTable = $('#priceTable');    
+        initPriceTable($priceTable);
+
+        $('#search').click(function(event) {
+            event.preventDefault();
+            if ($('#matDesc').val() == '' && $('#matNumber').val() == '' && $('#brand').val() == '') {
+                alert('조회 정보를 입력해야합니다');
+                return false;
+            };
+
+            var data = new FormData($('#getSalesPrice').get(0));
+
+            $.blockUI({
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
+
+            document.activeElement.blur(); // 모바일 기기 키보드 숨김.
+
+            $.ajax({
+                    type : 'POST',
+                    url : '/salesPrice/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data : data,
+                    }).done(function(response) {
+                        var parsed = JSON.parse(response);
+                        displayPriceData(parsed);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+
+
+    });
+});
+</script>
+<div class="container">
+    <div class="row">
+        <form action = "/getSalesPrice/" method="post" id="getSalesPrice">{% csrf_token %}
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="matDesc">자재내역</label>
+                    <input type="text" class="form-control" id="matDesc" name="matDesc" placeholder="자재내역">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="matNumber">형번</label>
+                    <input type="text" class="form-control" id="matNumber" name="matNumber" placeholder="형번">
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="brand">브랜드</label>
+                    <input type="text" class="form-control" id="brand" name="brand" placeholder="브랜드">
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="plant">플랜트</label>
+                    <select class="form-control" name="plant" id="plant">
+                        <option selected="selected" value='1411'>1411-산업기계팀 본사</option>
+                        <option value='1412'>1412-산업기계팀 영남</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="search">　</label>
+                    <button type="submit" class="btn btn-primary btn-block" id="search" name="search">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <table id="priceTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+</div>
+{% endblock %}

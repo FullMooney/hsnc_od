@@ -1,0 +1,77 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+    #mainLogoArea{width: inherit; margin: 0 auto; text-align: center; padding: 5px}
+    #mainLogoArea img{max-width: 250px; height: auto;}
+</style>
+<div class="container">
+    
+    <br>
+    <br>
+    <br>
+    <table id="mainLogoArea">
+        <tr>
+            <td>
+                <img src="{% static 'img/logo/tradeci_vertical_v1.png' %}">
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <br>
+    
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" href="#training">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#training">Training</a>
+                    </h4>
+                </div>
+                <div id="training" class="panel-collapse collapse">
+                    <div class="list-group">
+                        <a href="/trainModel" class="list-group-item list-group-item-action">Model Train</a>
+                        <a href="/manageModel" class="list-group-item list-group-item-action">Model Manage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" href="#test">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#test">Test</a>
+                    </h4>
+                </div>
+                <div id="test" class="panel-collapse collapse">
+                    <div class="list-group">
+                        <a href="/testModel" class="list-group-item list-group-item-action">Model Test</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" href="#admin">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#admin">Admin</a>
+                    </h4>
+                </div>
+                <div id="admin" class="panel-collapse collapse">
+                    <div class="list-group">
+                        <a href="/configuration" class="list-group-item list-group-item-action">Configuration</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

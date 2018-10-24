@@ -1,0 +1,108 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<script>
+    
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+
+    function statusFormatter(value, row, index) {
+        if (value === 1) {
+          return '<span class="label label-warning">Running</span>';
+        } else {
+          return '<span class="label label-success">Finished</span>';
+        }
+     }
+    
+    function initModelTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'MODELNAME',
+                title: 'ModelName',
+                sortable: true,
+            }, {
+                field: 'PID',
+                title: 'Process ID',
+                sortable: true,
+            }, {
+                field: 'LABEL',
+                title: 'Label',
+                sortable: true,
+            }, {
+                field: 'METHOD',
+                title: 'Method',
+                sortable: true,
+            }, {
+                field: 'CREATED_AT',
+                title: 'Created',
+                sortable: true,
+            }, {
+                field:'STATUS',
+                title:'Status',
+                align:'center',
+                formatter: 'statusFormatter',
+            }]
+        });
+    }
+
+    function displayModelData(list) {
+        $('#modelTable').bootstrapTable("load", list);
+    }
+
+    function getModels(){
+            $.ajax({
+                    type : 'POST',
+                    url : '/getModels/',
+                    enctype : "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    <!--data : formData,-->
+                    }).done(function(response) {
+                        var parsed = JSON.parse(response);
+                        displayModelData(parsed);
+                    }).always(function() {
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                    });
+    }
+    
+    $(function() {
+        var modelTable = $('#modelTable');
+        initModelTable(modelTable);
+        getModels();
+    });
+    
+    
+
+</script>
+<style>
+.file {
+  visibility: hidden;
+  position: absolute;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <table id="modelTable"
+            data-toolbar="#toolbar"
+            data-show-export="true"
+            data-search="false"
+            data-show-columns="true"
+            data-detail-view="false"
+            data-click-to-select="true"
+            data-mobile-responsive="true"
+            class='table table-hover'>
+        </table>
+    </div>
+
+
+</div>
+
+
+{% endblock %}
