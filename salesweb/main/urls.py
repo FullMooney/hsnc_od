@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^testModel', graphExport.as_view()),
 
     # Get Model.
-    # url(r'^getModels', getModels.as_view()),
+    url(r'^getModels', getModels.as_view()),
 
     # Get child Modelname 
     url(r'^ModelChild$', ModelCkpt.getModelChild),

@@ -250,31 +250,23 @@ class graphExport(TemplateView):
         ## 테스트 이미지 파일은 경로는 시간으로 분리해서 저장시켜놓고 테스트 시키자, Subprocess 에 경로만 넘겨줌
         ## 파일 경로에 있는 이미지 파일 들은 서브프로세스에서 od 한 결과 이미지로 파일 바꾸자
         print('----------object_detection test started--------------')
-        # files = request.FILES.getlist('files')
-        # fpath = '{}/{}'.format(child_path, datetime.now().strftime('%y%m%d%H%M%S'))
+        files = request.FILES.getlist('files')
+        fpath = '{}/{}'.format(child_path, datetime.now().strftime('%y%m%d%H%M%S'))
+        fpathList = ''
+        for idx, file in enumerate(files):
+            filepath = '{}/{}'.format(fpath, file.name)
+            path = default_storage.save(filepath, ContentFile(file.read()))
+            fpathList += filepath + ','
+            print(filepath)
         
-        # for idx, file in enumerate(files):
-        #     filePath = '{}/{}'.format(filepath, file.name)
-        #     path = default_storage.save(filePath, ContentFile(file.read()))
-        #     print(filePath)
-
-
-        
-        # args = [child, fpath] 
-        args = [child]
+        args = [child, fpathList] 
         print(args)
-        try:
-            testProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(os.getcwd() + '/main/object_detection/object_detection_test2.py')
-            output, stderr = testProc.communicate()
-            outarr = output.decode('utf-8').splitlines()
-        except OSError:
-            print(OSError)
-            return HttpResponse("Error Occured")
-        except SyntaxError:
-            print(SyntaxError)
-            return HttpResponse("Error Occured")
         
+        testProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(os.getcwd() + '/main/object_detection/object_detection_test.py')
+        output, stderr = testProc.communicate()
+        outarr = output.decode('utf-8').splitlines()
 
         print('---------object_detection test done---------------')
+
         return HttpResponse("Tested Successfully")    

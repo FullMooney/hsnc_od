@@ -36,9 +36,9 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = 'c:/hsnc_od/salesweb/main/object_detection/images/model181111225939/train_graph/frozen_inference_graph.pb'
+PATH_TO_FROZEN_GRAPH = 'c:/hsnc_od/salesweb/main/object_detection/images/{}/train_graph/frozen_inference_graph.pb'.format(sys.argv[1])
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('c:\hsnc_od\salesweb\main\object_detection\images\model181111225939', 'train.pbtxt')
+PATH_TO_LABELS = os.path.join('c:\hsnc_od\salesweb\main\object_detection\images\{}'.format(sys.argv[1]), 'train.pbtxt')
 
 NUM_CLASSES = 1
 
@@ -71,7 +71,10 @@ def load_image_into_numpy_array(image):
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
 
 # use / instead of \ which causes unicode error .. 
-TEST_IMAGE_PATHS =['C:/Users/mooney/Desktop/schoolbag/image.jpg']
+TEST_IMAGE_PATHS =[ ]
+for idx, x in enumerate(sys.argv[2].split(',')):
+  if os.path.exists(x): 
+    TEST_IMAGE_PATHS.append(x)
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
@@ -150,7 +153,7 @@ def main(_):
         line_thickness=8)
     plt.figure(figsize=IMAGE_SIZE)
     plt.imshow(image_np)
-    print(output_dict)
+    # print(output_dict)
     plt.show()
 
 if __name__ == '__main__':  
