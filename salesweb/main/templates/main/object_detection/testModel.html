@@ -1,0 +1,265 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<script>
+    
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+    
+    function initFileTable(table){
+        table.bootstrapTable({
+            columns: [ {
+                field: 'filename',
+                title: 'File',
+                sortable: true,
+            }]
+        });
+    }
+
+    function displayFileData(fileList) {
+        $('#fileTable').bootstrapTable("load", fileList);
+    }
+    
+    $(function() {
+        
+        var aJsonArray = new Array();
+        var formData = new FormData(document.getElementById('testForm'));
+        var $fileTable = $('#fileTable');
+        initFileTable($fileTable);
+        
+        $(document).on('click', '.browse', function(){
+          var file = $(this).parent().parent().parent().find('.file');
+          file.trigger('click');;
+        });
+        
+        $(document).on('change', '.file', function(){
+          var x = document.getElementById('files');
+          var inputText = '파일 ' + x.files.length + '개 선택';
+          for(var i=0; i<x.files.length; i++) {
+              var file = x.files[i];
+          }
+          $(this).parent().find('#imageText').val(inputText);
+        });
+        
+        /* Step 1. Model 선택 */
+        $('#model').on("change", function(){        	
+        	var method = $(this).val();        	
+        	/* selected model 에 해당하는 model 가져오기 */
+        	$.get('/ModelChild', { 'method': method		                           
+		                         }, 
+									function(data, status){
+										if(status == 'error'){
+											alert('getModelChild error');
+										}else{ 
+										    /*trained model select option 추가  */
+											$('select#modelchild').children().remove();
+											$.each(data, function(i){
+												$('#modelchild').append($('<option>', { 
+													value: data[i],
+													text: data[i]
+												}));
+											});
+											
+										}
+									},
+									'json'
+	        );
+        });
+        /* Step 2. Trained Model 선택 */
+        $('#modelchild').on("change", function(){        	
+        	var modelchild = $(this).val();       
+        	/* selected model 에 해당하는 model 가져오기 */
+        	$.get('/ModelCkpt', { 'parent': modelchild		                           
+		                         }, 
+									function(data, status){
+										if(status == 'error'){
+											alert('getModelChild error');
+										}else{ 
+										    /*model checkpoint select option 추가  */
+											$('select#modelckpt').children().remove();
+											$.each(data, function(i){
+												$('#modelckpt').append($('<option>', { 
+													value: data[i],
+													text: data[i]
+												}));
+											});
+											
+										}
+									},
+									'json'
+	        );
+        });
+
+        $('#addToList').click(function(event) {
+            event.preventDefault();
+            
+            var x = document.getElementById('files');
+            
+            for(var i=0; i<x.files.length; i++) {
+                var aJson = new Object();
+                var file = x.files[i];
+                
+                aJson.filename = file.name;
+                aJsonArray.push(aJson);
+                formData.append('files', file);            
+            };
+            console.log(formData.getAll('files'));
+            displayFileData(aJsonArray);
+        });
+        
+        $('#export').click(function(event) {
+            formData.append('child', $('#modelchild').val());
+            formData.append('ckpt', $('#modelckpt').val());
+            
+            $.ajax({
+                    type : 'POST',
+                    method: 'POST',
+                    url : '/testModel/',   
+                    processData: false,
+                    contentType: false,                 
+                    data : formData,
+                    }).done(function(response) {
+                        //var parsed = JSON.parse(response);
+                        alert(response);
+                    }).always(function() {
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                    });            
+        });
+
+        $('#doTest').click(function(event) {
+            
+            $.ajax({
+                    type : 'POST',
+                    method: 'POST',
+                    url : '/doTest/',   
+                    processData: false,
+                    contentType: false,                 
+                    data : formData,
+                    }).done(function(response) {
+                        //var parsed = JSON.parse(response);
+                        alert(response);
+                        $.unblockUI();
+                    }).always(function() {
+                        $.unblockUI();
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
+                    });
+        });
+
+        $('#model').val('SSD').trigger('change');
+    });
+    
+    
+
+</script>
+<style>
+.file {
+  visibility: hidden;
+  position: absolute;
+}
+</style>
+<div class="container">
+    <div class="row">
+    	<form action='/testModel/' method="post" id="testForm">{% csrf_token %}
+    		<input type="hidden" id="child" name="child" />
+    		<input type="hidden" id="ckpt" name="ckpt" />
+    	</form>
+    	<form action = "/getModelChild" method="get" id="getModelChildForm" >
+    		
+    		<div class="col-sm-3">
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <select class="form-control" name="model" id="model">
+                        <option selected="selected" value='SSD'>SSD Mobilenet</option>
+                        <option value='FRCNN'>F-RCNN</option>
+                        <option value='YOLOV2'>YOLO v2</option>
+                    </select>                    
+                </div>                
+            </div>
+            <div class="col-sm-3">
+            	<div class="form-group">
+            		<label for="modelchild">Trained Model</label>
+                    <select class="form-control" name="modelchild" id="modelchild">
+                        <option selected="selected" value=''>--</option>                        
+                    </select>
+                </div>	
+            </div>
+            <div class="col-sm-3">
+            	<div class="form-group">
+            		<label for="modelckpt">Model Checkpoint</label>
+                    <select class="form-control" name="modelckpt" id="modelckpt">
+                        <option selected="selected" value=''>--</option>                        
+                    </select>
+                </div>	
+            </div>
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="testModel">　</label>
+                    <button type="button" class="btn btn-danger btn-block" id="export" name="export">Export Graph</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <form action = "/testDataForm/" method="post" id="testDataForm" enctype="multipart/form-data">
+            <div class="col-sm-4">                
+                <div class="form-group">
+                    <label for="testImage">Images</label>
+                    <input type="file" name="files" id="files" class="file" multiple>
+                    <input type="hidden" name="labels" id="labels">
+                        <div class="input-group col-xs-12">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-picture"></i></span>
+                            <input type="text" class="form-control" disabled placeholder="Upload Image" id="imageText">
+                            <span class="input-group-btn">
+                                <button class="browse btn btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                            </span>
+                        </div>
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="addToList">　</label>
+                    <button type="submit" class="btn btn-warning btn-block" id="addToList" name="addToList">Add To List</button>
+                </div>
+            </div>
+            
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="testModel">　</label>
+                    <button type="button" class="btn btn-danger btn-block" id="doTest" name="doTest">Do Test</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table id="fileTable"
+        data-toolbar="#toolbar"
+        data-show-export="true"
+        data-search="false"
+        data-show-columns="true"
+        data-detail-view="false"
+        data-click-to-select="true"
+        data-mobile-responsive="true"]
+        class='table table-hover'>
+    </table>
+</div>
+
+
+
+
+
+
+
+
+
+{% endblock %}

@@ -122,3 +122,5 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/main/object_detection/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'main/object_detection/images')
+
+CKPT_ROOT = os.path.join(BASE_DIR, 'main/object_detection/images/')

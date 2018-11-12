@@ -95,6 +95,9 @@ import tensorflow as tf
 from google.protobuf import text_format
 from object_detection import exporter
 from object_detection.protos import pipeline_pb2
+import os
+import sys
+
 
 slim = tf.contrib.slim
 flags = tf.app.flags
@@ -125,7 +128,10 @@ tf.app.flags.mark_flag_as_required('trained_checkpoint_prefix')
 tf.app.flags.mark_flag_as_required('output_directory')
 FLAGS = flags.FLAGS
 
-
+# FLAGS.input_type = sys.argv[1]
+# FLAGS.pipeline_config_path = sys.argv[2]
+# FLAGS.trained_checkpoint_prefix = sys.argv[3]
+# FLAGS.output_directory = sys.argv[4]
 def main(_):
   pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
   with tf.gfile.GFile(FLAGS.pipeline_config_path, 'r') as f:
@@ -144,4 +150,8 @@ def main(_):
 
 
 if __name__ == '__main__':
+  FLAGS.input_type = sys.argv[1]
+  FLAGS.pipeline_config_path = sys.argv[2]
+  FLAGS.trained_checkpoint_prefix = sys.argv[3]
+  FLAGS.output_directory = sys.argv[4]
   tf.app.run()

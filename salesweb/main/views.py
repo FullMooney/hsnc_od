@@ -3,7 +3,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.template import RequestContext
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView, DetailView
 from decimal import Decimal
 from .models import TrainingModel
 from dateutil.relativedelta import relativedelta
@@ -22,6 +22,15 @@ import json
 import sys
 import subprocess
 import psutil
+
+## model selection
+from django.db.models import Q
+from django.shortcuts import render
+from django.core import serializers
+
+from os import listdir
+from os.path import isfile, join
+
 
 
 BASE_DIR = os.getcwd()
@@ -172,3 +181,100 @@ def makeConfigFile(configFile, num_classes, batch_size, num_steps, input_path, l
         else:
             f.write(x + '\n')
     f.close()
+
+
+class ModelCkpt(DetailView):
+    def getModelChild(request):        
+        method = request.GET.get("method", "")
+        print("method==" + method)
+        childModel = TrainingModel.objects.all().values().filter(method = method)
+        childModel_list = []
+        for a in childModel:
+            childModel_list.append(a['modelname'])
+       
+        return HttpResponse(json.dumps(childModel_list), content_type='application/json')
+
+    def getModelCkpt(request):
+        parent = request.GET.get("parent", "")
+        mypath = os.path.join(settings.CKPT_ROOT, parent)
+        print("Trained model==" + mypath)
+        
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        onlymodel = []
+        latestSeq = 0
+        tmpCkpt = ''
+        for file in onlyfiles:
+            if file[:11]=='model.ckpt-' :
+                # index, meta 파일 다 있는것만 출력 --> meta 파일이 가장늦게 생성된다 이것만 찾으면 됨
+                # index, meta 제외 --> meta만 찾자 
+                # ckpt 숫자 가장 높은것만 - 나오는 순서가 파일명으로 sorting 되는지 모르겠으니 일단 swap 
+                if file[-4:]=='meta' :
+                    print(int(file[11:-5])) # sequence만 따오기
+                    if latestSeq <= int(file[11:-5]) :
+                        tmpCkpt = file[:-5]
+        
+        onlymodel.append(tmpCkpt)
+        
+        return HttpResponse(json.dumps(onlymodel), content_type='application/json')
+        
+
+class graphExport(TemplateView):
+    template_name = 'main/object_detection/testModel.html'
+    def post(self, request):
+        
+        child = request.POST['child']
+        ckpt = request.POST['ckpt']
+        
+        image_path = 'c:/hsnc_od/salesweb/main/object_detection/images/'
+        child_path = image_path + child
+        train_graph_path =  child_path + '/train_graph'
+        # train_graph export
+        # train_graph 있으면 pass
+        if not os.path.exists(train_graph_path):
+            print('-----------export infrerence graph started-------------')
+            args = ['image_tensor', child_path +'/train.config',  child_path + '/' + ckpt ,  train_graph_path ]
+            print(args)
+
+            recordProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/export_inference_graph.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            output, stderr = recordProc.communicate()
+            outarr = output.decode('utf-8').splitlines()
+            
+            print('-----------export infrerence graph done-------------')
+
+        # return HttpResponse("Graph Exported Successfully")
+
+        # child = request.GET.get('child','')
+
+        ## image list test
+        ## 테스트 이미지 파일은 경로는 시간으로 분리해서 저장시켜놓고 테스트 시키자, Subprocess 에 경로만 넘겨줌
+        ## 파일 경로에 있는 이미지 파일 들은 서브프로세스에서 od 한 결과 이미지로 파일 바꾸자
+        print('----------object_detection test started--------------')
+        # files = request.FILES.getlist('files')
+        # fpath = '{}/{}'.format(child_path, datetime.now().strftime('%y%m%d%H%M%S'))
+        
+        # for idx, file in enumerate(files):
+        #     filePath = '{}/{}'.format(filepath, file.name)
+        #     path = default_storage.save(filePath, ContentFile(file.read()))
+        #     print(filePath)
+
+
+        
+        # args = [child, fpath] 
+        args = [child]
+        print(args)
+        try:
+            testProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(os.getcwd() + '/main/object_detection/object_detection_test2.py')
+            output, stderr = testProc.communicate()
+            outarr = output.decode('utf-8').splitlines()
+        except OSError:
+            print(OSError)
+            return HttpResponse("Error Occured")
+        except SyntaxError:
+            print(SyntaxError)
+            return HttpResponse("Error Occured")
+        
+
+        print('---------object_detection test done---------------')
+        return HttpResponse("Tested Successfully")    
