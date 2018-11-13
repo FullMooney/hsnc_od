@@ -120,6 +120,11 @@ Hanwha
         });
         
         $('#export').click(function(event) {
+        	if (formData.getAll('files').length < 1) {
+                alert('Test 대상 Image가 없습니다');
+                return false;
+            };
+            $('#resultview').empty();
             formData.append('child', $('#modelchild').val());
             formData.append('ckpt', $('#modelckpt').val());
             //masking
@@ -260,7 +265,7 @@ Hanwha
 	        >
 	    </table>
 
-	    <div id="resultview" >
+	    <div id="resultview" style="border: 1px; border-color: #00bb22; width:90%;">
 	    </div>
 	</div>
 </div>

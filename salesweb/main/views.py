@@ -29,7 +29,7 @@ from django.core import serializers
 
 from os import listdir
 from os.path import isfile, join
-from shutil import copyfile, copy2
+from shutil import copyfile, copy2, rmtree
 
 
 
@@ -292,6 +292,8 @@ class graphExport(TemplateView):
         output, stderr = testProc.communicate()
         outarr = output.decode('utf-8').splitlines()
 
+        # delete temp folder
+        rmtree(fpath)
         print('---------object_detection test done---------------')
 
         return HttpResponse(json.dumps(resultpath), content_type='application/json')   
