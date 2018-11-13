@@ -3,6 +3,8 @@ from datetime import datetime
 from django.db import models
 from django.conf import settings
 
+
+
 # Create your models here.
 class TrainingModel(models.Model):
     modelname = models.CharField(max_length=100, null=True, blank=True)
@@ -15,33 +17,23 @@ class TrainingModel(models.Model):
         return self.modelname
 
 
-class TestingModel(models.Model):
-	"""docstring for TestingModel"""
-	rid        = models.CharField(max_length=100, null=True, blank=False)
-	method     = models.CharField(max_length=100, null=True, blank=False)
-	modelname  = models.CharField(max_length=100, null=True, blank=False)
-	pid        = models.CharField(max_length=100, null=True, blank=True)
-	created_at = models.DateTimeField(default=datetime.now, blank=False)
-
-	def __init__(self):
-		rid = SavingResult.model.objects.update(rid=F('rid')+1) 
-
-	def modelList():
-		pass
-		
-
-class SavingResult(models.Model):
+class ResultModel(models.Model):
 	"""docstring for TestingModel"""
 	
-	rid        = models.IntegerField(blank=False)
+	datetime   = models.TextField(blank=False)
+	seq        = models.IntegerField(default=1) 
 	label      = models.TextField()
 	px         = models.IntegerField(default=0)
 	py         = models.IntegerField(default=0)
 	width      = models.IntegerField()
 	height     = models.IntegerField()
 	image_path = models.CharField(max_length=100)
-	hit_yn     = models.CharField(max_length=1, default="Y", blank=False) 
+	hit_yn     = models.CharField(max_length=1, default="Y", blank=False)
+	ip         = models.TextField() 
 
 	def __str__(self):
-		return "{} {}".format(self.rid, self.label)
+		return self.datetime
+
+	def get_path(self):
+		return self.image_path
 

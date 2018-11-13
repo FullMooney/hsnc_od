@@ -79,6 +79,9 @@ for idx, x in enumerate(sys.argv[2].split(',')):
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
 
+RESULT_IMAGE_PATHS = [ ]
+for idx, x in enumerate(sys.argv[3].split(',')):
+  RESULT_IMAGE_PATHS.append(x)
 
 # In[10]:
 
@@ -131,7 +134,7 @@ def main(_):
 
 
   # In[11]:
-
+  idx=0
   for image_path in TEST_IMAGE_PATHS:
     image = Image.open(image_path)
     # the array based representation of the image will be used later in order to prepare the
@@ -154,7 +157,11 @@ def main(_):
     plt.figure(figsize=IMAGE_SIZE)
     plt.imshow(image_np)
     # print(output_dict)
-    plt.show()
+    # plt.show()
+    # fpath = 'C:/hsnc_od/salesweb/static/img/test/' + 
+
+    plt.savefig(RESULT_IMAGE_PATHS[idx])
+    idx += 1
 
 if __name__ == '__main__':  
   tf.app.run()

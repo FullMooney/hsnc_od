@@ -25,11 +25,11 @@ import psutil
 
 ## model selection
 from django.db.models import Q
-from django.shortcuts import render
 from django.core import serializers
 
 from os import listdir
 from os.path import isfile, join
+from shutil import copyfile, copy2
 
 
 
@@ -226,6 +226,8 @@ class graphExport(TemplateView):
         ckpt = request.POST['ckpt']
         
         image_path = 'c:/hsnc_od/salesweb/main/object_detection/images/'
+        # image_path = settings.CKPT_ROOT
+        # print(image_path)
         child_path = image_path + child
         train_graph_path =  child_path + '/train_graph'
         # train_graph export
@@ -235,7 +237,7 @@ class graphExport(TemplateView):
             args = ['image_tensor', child_path +'/train.config',  child_path + '/' + ckpt ,  train_graph_path ]
             print(args)
 
-            recordProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/export_inference_graph.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            recordProc = subprocess.Popen(["python", BASE_DIR + '/main/object_detection/export_inference_graph.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             output, stderr = recordProc.communicate()
             outarr = output.decode('utf-8').splitlines()
@@ -251,22 +253,48 @@ class graphExport(TemplateView):
         ## 파일 경로에 있는 이미지 파일 들은 서브프로세스에서 od 한 결과 이미지로 파일 바꾸자
         print('----------object_detection test started--------------')
         files = request.FILES.getlist('files')
-        fpath = '{}/{}'.format(child_path, datetime.now().strftime('%y%m%d%H%M%S'))
+        nowtime = datetime.now().strftime('%y%m%d%H%M%S')
+        staticImgPath = '/static/img/test/{}/{}'.format(child, nowtime)
+        staticPath = 'c:/hsnc_od/salesweb'+ staticImgPath
+        fpath = '{}/{}'.format(child_path, nowtime)
         fpathList = ''
+        rpathList = ''
+        resultpath=[]
+
+        try:
+            if not os.path.isdir(staticPath):
+                os.makedirs(os.path.join(staticPath))
+        except OSError as e:
+            print(e)        
+        
+        
         for idx, file in enumerate(files):
             filepath = '{}/{}'.format(fpath, file.name)
-            path = default_storage.save(filepath, ContentFile(file.read()))
+            rpath = '{}/{}'.format(staticPath, file.name)
+            path = default_storage.save(filepath, ContentFile(file.read())) 
+            tmp = Image.open(filepath)
+            tmp.save(rpath)
+            # fid = open(rpath, "w")
+            # fid.write(ContentFile(file.read()))
+            # fid.close()
+            # copy2(filepath, rpath)
             fpathList += filepath + ','
+            rpathList += rpath + ','
+            resultpath.append('{}/{}'.format(staticImgPath, file.name))
             print(filepath)
-        
-        args = [child, fpathList] 
+            
+
+        args = [child, fpathList, rpathList] 
         print(args)
         
-        testProc = subprocess.Popen(["python", os.getcwd() + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(os.getcwd() + '/main/object_detection/object_detection_test.py')
+        testProc = subprocess.Popen(["python", BASE_DIR + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # print(os.getcwd() + '/main/object_detection/object_detection_test.py')
         output, stderr = testProc.communicate()
         outarr = output.decode('utf-8').splitlines()
 
         print('---------object_detection test done---------------')
 
-        return HttpResponse("Tested Successfully")    
+        return HttpResponse(json.dumps(resultpath), content_type='application/json')   
+
+    def get_image_url():
+        pass

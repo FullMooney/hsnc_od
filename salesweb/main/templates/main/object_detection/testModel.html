@@ -98,6 +98,11 @@ Hanwha
         });
 
         $('#addToList').click(function(event) {
+        	aJsonArray = new Array();
+        	formData = new FormData(document.getElementById('testForm'));
+        	$('#resultview').empty();
+        	$('#fileTable > tbody > tr').remove();
+
             event.preventDefault();
             
             var x = document.getElementById('files');
@@ -117,6 +122,15 @@ Hanwha
         $('#export').click(function(event) {
             formData.append('child', $('#modelchild').val());
             formData.append('ckpt', $('#modelckpt').val());
+            //masking
+            $.blockUI({ 
+                message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",
+                css : {
+                    backgroundColor : 'rgba(0,0,0,0.0)',
+                    color : '#000000',
+                    border: '0px solid #a00'
+                }
+            });
             
             $.ajax({
                     type : 'POST',
@@ -126,36 +140,29 @@ Hanwha
                     contentType: false,                 
                     data : formData,
                     }).done(function(response) {
-                        //var parsed = JSON.parse(response);
-                        alert(response);
+                        // alert(response);
+                        var rpath = JSON.stringify(response);
+                        var ipath = rpath.split(',');
+                        
+                        for(var i in ipath){
+                        	ipath[i] = ipath[i].replace(/"/g, "").replace(/\[/g, "").replace(/\]/g, "");
+                        	// $('#resultview').prepend($('<img>', {id: i, src: rpath[i] }));
+                    		
+                    		// $('.bootstrap-table').css('width', '50%').css('float', 'left');
+                    		// $('.clearfix').css('width', '0%').css('float', 'left');
+                    		$('#resultview').append($('<img>', {id: 'img'+i, src: ipath[i], width: '90%'})); //.css('width', '50%').css('float', 'right');
+                        };
+                        $.unblockUI();
                     }).always(function() {
+                    	$.unblockUI();
                     }).error(function(request, status, error) {
                         alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        $.unblockUI();
                     });            
         });
 
-        $('#doTest').click(function(event) {
-            
-            $.ajax({
-                    type : 'POST',
-                    method: 'POST',
-                    url : '/doTest/',   
-                    processData: false,
-                    contentType: false,                 
-                    data : formData,
-                    }).done(function(response) {
-                        //var parsed = JSON.parse(response);
-                        alert(response);
-                        $.unblockUI();
-                    }).always(function() {
-                        $.unblockUI();
-                    }).error(function(request, status, error) {
-                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
-                        $.unblockUI();
-                    });
-        });
-
         $('#model').val('SSD').trigger('change');
+
     });
     
     
@@ -240,17 +247,22 @@ Hanwha
             </div> -->
         </form>
     </div>
+    <div>
+	    <table id="fileTable"
+	        data-toolbar="#toolbar"
+	        data-show-export="true"
+	        data-search="false"
+	        data-show-columns="true"
+	        data-detail-view="false"
+	        data-click-to-select="true"
+	        data-mobile-responsive="true"
+	        class='table table-hover'
+	        >
+	    </table>
 
-    <table id="fileTable"
-        data-toolbar="#toolbar"
-        data-show-export="true"
-        data-search="false"
-        data-show-columns="true"
-        data-detail-view="false"
-        data-click-to-select="true"
-        data-mobile-responsive="true"]
-        class='table table-hover'>
-    </table>
+	    <div id="resultview" >
+	    </div>
+	</div>
 </div>
 
 
