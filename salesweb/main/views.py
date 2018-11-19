@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.template import RequestContext
 from django.views.generic import View, TemplateView, DetailView
 from decimal import Decimal
-from .models import TrainingModel
+from .models import TrainingModel, ResultModel
 from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -30,7 +30,7 @@ from django.core import serializers
 from os import listdir
 from os.path import isfile, join
 from shutil import copyfile, copy2, rmtree
-
+from ipware import get_client_ip
 
 
 BASE_DIR = os.getcwd()
@@ -140,7 +140,7 @@ class trainModel(TemplateView):
         output, stderr = recordProc.communicate()
 
         outarr = output.decode('utf-8').splitlines()
-        print(outarr)
+
         if 'True' not in outarr:
             return HttpResponse("Training Failed")
 
@@ -282,6 +282,22 @@ class graphExport(TemplateView):
             rpathList += rpath + ','
             resultpath.append('{}/{}'.format(staticImgPath, file.name))
             print(filepath)
+            ip, is_routable = get_client_ip(request)
+            newResultModel = ResultModel.objects.create(
+                methodname="SSD",
+                modelname=child,
+                datetime=nowtime,
+                filename=file.name,
+                px=1,
+                py=1,
+                width=300,
+                height=300,
+                image_path=rpath,
+                hit_yn='Y',
+                ip=ip,
+                label=''
+            )
+            newResultModel.save()
             
 
         args = [child, fpathList, rpathList] 
@@ -291,10 +307,22 @@ class graphExport(TemplateView):
         # print(os.getcwd() + '/main/object_detection/object_detection_test.py')
         output, stderr = testProc.communicate()
         outarr = output.decode('utf-8').splitlines()
+        print('###########')
+        print(output)
+        print('###########')
+        # print(stderr)
+        # print('###########')
+        print(outarr)
+        print('###########')
 
         # delete temp folder
         rmtree(fpath)
+
+
+
         print('---------object_detection test done---------------')
+
+
 
         return HttpResponse(json.dumps(resultpath), content_type='application/json')   
 

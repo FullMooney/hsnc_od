@@ -18,21 +18,21 @@ class TrainingModel(models.Model):
 
 
 class ResultModel(models.Model):
-	"""docstring for TestingModel"""
-	
-	datetime   = models.TextField(blank=False)
-	seq        = models.IntegerField(default=1) 
-	label      = models.TextField()
+	methodname     = models.CharField(max_length=30, null=False, default='SSD')
+	modelname  = models.CharField(max_length=100, null=False, blank=False, default='model_blank')
+	datetime   = models.CharField(max_length=12, blank=False)
+	filename   = models.CharField(max_length=100)
+	label      = models.CharField(max_length=100)
 	px         = models.IntegerField(default=0)
 	py         = models.IntegerField(default=0)
-	width      = models.IntegerField()
-	height     = models.IntegerField()
-	image_path = models.CharField(max_length=100)
+	width      = models.IntegerField(default=0)
+	height     = models.IntegerField(default=0)
+	image_path = models.TextField()
 	hit_yn     = models.CharField(max_length=1, default="Y", blank=False)
-	ip         = models.TextField() 
+	ip         = models.CharField(max_length=15)
 
 	def __str__(self):
-		return self.datetime
+		return '{}/{}/{}/{}'.format(self.methodname , self.modelname , self.datetime, self.filename)
 
 	def get_path(self):
 		return self.image_path
