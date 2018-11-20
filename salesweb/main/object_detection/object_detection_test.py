@@ -83,7 +83,10 @@ RESULT_IMAGE_PATHS = [ ]
 for idx, x in enumerate(sys.argv[3].split(',')):
   RESULT_IMAGE_PATHS.append(x)
 
-# In[10]:
+FILE_NAMES = [ ]
+for idx, x in enumerate(sys.argv[4].split(',')):
+    FILE_NAMES.append(x)
+
 
 def main(_):
   def run_inference_for_single_image(image, graph):
@@ -135,6 +138,7 @@ def main(_):
 
   # In[11]:
   idx=0
+  odcnt = 0
   for image_path in TEST_IMAGE_PATHS:
     image = Image.open(image_path)
     # the array based representation of the image will be used later in order to prepare the
@@ -158,9 +162,20 @@ def main(_):
     plt.imshow(image_np)
     # print(output_dict)
     # plt.show()
-    # fpath = 'C:/hsnc_od/salesweb/static/img/test/' + 
 
-    plt.savefig(RESULT_IMAGE_PATHS[idx])
+    for detected in output_dict['detection_scores']:
+        if detected >= 0.80:
+            print(
+                "{'idx':'%s', 'class': '%s', 'score': %0.2f, 'ymin': %0.2f, 'xmin': %0.2f, 'ymax': %0.2f, 'xmax': %0.2f , 'image_path': '%s', 'filename': '%s'}" % (
+                    idx, category_index[output_dict['detection_classes'][idx]].get('name'), round(detected, 4),
+                    round(output_dict['detection_boxes'][idx][0],4), round(output_dict['detection_boxes'][idx][1],4),
+                          round(output_dict['detection_boxes'][idx][2],4), round(output_dict['detection_boxes'][idx][3],4),
+                    RESULT_IMAGE_PATHS[idx], FILE_NAMES[idx]
+                ))
+
+            odcnt += 1
+            plt.savefig(RESULT_IMAGE_PATHS[idx])
+
     idx += 1
 
 if __name__ == '__main__':  

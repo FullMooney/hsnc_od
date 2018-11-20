@@ -22,6 +22,7 @@ import json
 import sys
 import subprocess
 import psutil
+import ast
 
 ## model selection
 from django.db.models import Q
@@ -257,6 +258,7 @@ class graphExport(TemplateView):
         staticImgPath = '/static/img/test/{}/{}'.format(child, nowtime)
         staticPath = 'c:/hsnc_od/salesweb'+ staticImgPath
         fpath = '{}/{}'.format(child_path, nowtime)
+        filenameList = ''
         fpathList = ''
         rpathList = ''
         resultpath=[]
@@ -278,43 +280,45 @@ class graphExport(TemplateView):
             # fid.write(ContentFile(file.read()))
             # fid.close()
             # copy2(filepath, rpath)
+            filenameList += file.name + ','
             fpathList += filepath + ','
             rpathList += rpath + ','
             resultpath.append('{}/{}'.format(staticImgPath, file.name))
             print(filepath)
-            ip, is_routable = get_client_ip(request)
-            newResultModel = ResultModel.objects.create(
-                methodname="SSD",
-                modelname=child,
-                datetime=nowtime,
-                filename=file.name,
-                px=1,
-                py=1,
-                width=300,
-                height=300,
-                image_path=rpath,
-                hit_yn='Y',
-                ip=ip,
-                label=''
-            )
-            newResultModel.save()
+
             
 
-        args = [child, fpathList, rpathList] 
+        args = [child, fpathList, rpathList, filenameList]
         print(args)
         
         testProc = subprocess.Popen(["python", BASE_DIR + '/main/object_detection/object_detection_test.py'] + args , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # print(os.getcwd() + '/main/object_detection/object_detection_test.py')
         output, stderr = testProc.communicate()
         outarr = output.decode('utf-8').splitlines()
-        print('###########')
-        print(output)
-        print('###########')
-        # print(stderr)
-        # print('###########')
-        print(outarr)
-        print('###########')
 
+        # print(outarr)
+        print('saving resultmodel-------')
+        for dat in outarr:
+            outarr_dict = ast.literal_eval(dat)
+            print(outarr_dict)
+            ip, is_routable = get_client_ip(request)
+            newResultModel = ResultModel.objects.create(
+                methodname="SSD",
+                modelname=child,
+                datetime=nowtime,
+                filename=outarr_dict.get('filename'),
+                px=outarr_dict.get('xmin'),
+                py=outarr_dict.get('ymin'),
+                width=outarr_dict.get('xmax'),
+                height=outarr_dict.get('ymax'),
+                image_path=outarr_dict.get('image_path'),
+                hit_yn='Y',
+                ip=ip,
+                label=outarr_dict.get('class'),
+                score=outarr_dict.get('score')
+            )
+            newResultModel.save()
+        print('-------saving resultmodel')
         # delete temp folder
         rmtree(fpath)
 
