@@ -68,18 +68,6 @@ TEMPLATES = [
     },
 ]
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.oracle',
-#         'NAME': 'BMSD',
-#         'USER': 'dcnpif_ls',
-#         'PASSWORD': 'dusruf12!',
-#         'HOST': '55.101.200.103',
-#         'PORT': '1524'
-#     }
-# }
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',

@@ -19,12 +19,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="968" />
+          <entry key="py" value="972" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="968" />
+          <entry key="Python" value="972" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -43,11 +43,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/salesweb/salesweb/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1824">
-              <caret line="96" column="23" selection-start-line="96" selection-start-column="23" selection-end-line="96" selection-end-column="23" />
+            <state relative-caret-position="57">
+              <caret line="69" lean-forward="true" selection-start-line="69" selection-end-line="69" />
             </state>
           </provider>
         </entry>
@@ -78,11 +78,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="650">
-              <caret line="174" lean-forward="true" selection-start-line="174" selection-end-line="174" />
+              <caret line="174" selection-start-line="174" selection-end-line="174" />
             </state>
           </provider>
         </entry>
@@ -152,12 +152,13 @@
         <option value="$PROJECT_DIR$/salesweb/main/views.py" />
         <option value="$PROJECT_DIR$/salesweb/main/models.py" />
         <option value="$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py" />
+        <option value="$PROJECT_DIR$/salesweb/salesweb/settings.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1859" />
-    <option name="y" value="21" />
+    <option name="x" value="2020" />
+    <option name="y" value="420" />
     <option name="width" value="1847" />
     <option name="height" value="1087" />
   </component>
@@ -274,13 +275,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/salesweb/salesweb/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1824">
-          <caret line="96" column="23" selection-start-line="96" selection-start-column="23" selection-end-line="96" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/generate_tfrecord.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -348,7 +342,14 @@
     <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="650">
-          <caret line="174" lean-forward="true" selection-start-line="174" selection-end-line="174" />
+          <caret line="174" selection-start-line="174" selection-end-line="174" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/salesweb/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="69" lean-forward="true" selection-start-line="69" selection-end-line="69" />
         </state>
       </provider>
     </entry>
