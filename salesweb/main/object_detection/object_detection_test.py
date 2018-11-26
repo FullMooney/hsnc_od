@@ -34,6 +34,7 @@ if StrictVersion(tf.__version__) < StrictVersion('1.9.0'):
 from utils import label_map_util
 
 from utils import visualization_utils as vis_util
+import cx_Oracle
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
 PATH_TO_FROZEN_GRAPH = 'c:/hsnc_od/salesweb/main/object_detection/images/{}/train_graph/frozen_inference_graph.pb'.format(sys.argv[1])
@@ -139,6 +140,7 @@ def main(_):
   # In[11]:
   idx=0
   odcnt = 0
+
   for image_path in TEST_IMAGE_PATHS:
     image = Image.open(image_path)
     # the array based representation of the image will be used later in order to prepare the
@@ -167,9 +169,9 @@ def main(_):
         if detected >= 0.80:
             print(
                 "{'idx':'%s', 'class': '%s', 'score': %0.2f, 'ymin': %0.2f, 'xmin': %0.2f, 'ymax': %0.2f, 'xmax': %0.2f , 'image_path': '%s', 'filename': '%s'}" % (
-                    idx, category_index[output_dict['detection_classes'][idx]].get('name'), round(detected, 4),
-                    round(output_dict['detection_boxes'][idx][0],4), round(output_dict['detection_boxes'][idx][1],4),
-                          round(output_dict['detection_boxes'][idx][2],4), round(output_dict['detection_boxes'][idx][3],4),
+                    idx, category_index[output_dict['detection_classes'][idx]].get('name'), detected,
+                    output_dict['detection_boxes'][idx][0], output_dict['detection_boxes'][idx][1],
+                          output_dict['detection_boxes'][idx][2], output_dict['detection_boxes'][idx][3],
                     RESULT_IMAGE_PATHS[idx], FILE_NAMES[idx]
                 ))
 
@@ -177,6 +179,7 @@ def main(_):
             plt.savefig(RESULT_IMAGE_PATHS[idx])
 
     idx += 1
+
 
 if __name__ == '__main__':  
   tf.app.run()

@@ -32,7 +32,7 @@ from os import listdir
 from os.path import isfile, join
 from shutil import copyfile, copy2, rmtree
 from ipware import get_client_ip
-
+import cx_Oracle
 
 BASE_DIR = os.getcwd()
 
@@ -299,6 +299,7 @@ class graphExport(TemplateView):
         # print(outarr)
         print('saving resultmodel-------')
         for dat in outarr:
+            # postgres
             outarr_dict = ast.literal_eval(dat)
             print(outarr_dict)
             ip, is_routable = get_client_ip(request)
@@ -318,6 +319,19 @@ class graphExport(TemplateView):
                 score=outarr_dict.get('score')
             )
             newResultModel.save()
+            # oracle
+            try:
+                conn = cx_Oracle.connect("stwbsp/wjstk12!@55.101.200.103:1531/BSPD")
+                cursor = conn.cursor()
+                sql_insert = "insert into MAIN_RESULTMODEL (methodname, modelname, datetime, filename, px, py, width, height, image_path, hit_yn, ip, label, score) VALUES (:methodname, :modelname, :datetime, :filename, :px, :py, :width, :height, :image_path, :hit_yn, :ip, :label, :score)"
+                cursor.execute(sql_insert, methodname="SSD", modelname=child, datetime=nowtime, filename=outarr_dict.get('filename'), px=outarr_dict.get('xmin'), py=outarr_dict.get('ymin'), width=outarr_dict.get('xmax'), height=outarr_dict.get('ymax'), image_path=outarr_dict.get('image_path'), hit_yn="Y", ip=ip, label=outarr_dict.get('class'), score=outarr_dict.get('score'))
+                conn.commit()
+                cursor.close()
+                conn.close()
+            except cx_Oracle.DatabaseError as e:
+                print(e)
+                cursor.close()
+                conn.close()
         print('-------saving resultmodel')
         # delete temp folder
         rmtree(fpath)
