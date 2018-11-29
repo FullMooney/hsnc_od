@@ -1,0 +1,218 @@
+{% extends "core/base.html" %}
+{% block title %}
+Hanwha
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<script>
+    
+    function commaFormatter(amount) {
+        var n = amount.toLocaleString();
+        return n;
+    }
+    
+
+    $(function() {
+        
+        var aJsonArray = new Array();
+        var formData = new FormData(document.getElementById('testForm'));
+
+
+        /* Step 1. Model 선택 */
+        $('#model').on("change", function(){        	
+        	var method = $(this).val();        	
+        	/* selected model 에 해당하는 model 가져오기 */
+        	$.get('/ModelChild', { 'method': method		                           
+		                         }, 
+									function(data, status){
+										if(status == 'error'){
+											alert('getModelChild error');
+										}else{ 
+										    /*trained model select option 추가  */
+											$('select#modelchild').children().remove();
+											$.each(data, function(i){
+												$('#modelchild').append($('<option>', { 
+													value: data[i],
+													text: data[i]
+												}));
+											});
+											
+										}
+									},
+									'json'
+	        );
+        });
+        /* Step 2. Trained Model 선택 */
+        $('#modelchild').on("change", function(){        	
+        	var modelchild = $(this).val();       
+        	/* selected model 에 해당하는 model 가져오기 */
+        	$.get('/ModelCkpt', { 'parent': modelchild		                           
+		                         }, 
+									function(data, status){
+										if(status == 'error'){
+											alert('getModelChild error');
+										}else{ 
+										    /*model checkpoint select option 추가  */
+											$('select#modelckpt').children().remove();
+											$.each(data, function(i){
+												$('#modelckpt').append($('<option>', { 
+													value: data[i],
+													text: data[i]
+												}));
+											});
+											
+										}
+									},
+									'json'
+	        );
+        });
+
+
+        $('#export').click(function(event) {
+        	formData.append('child', $('#modelchild').val());
+            formData.append('ckpt', $('#modelckpt').val());
+            //masking
+            <!--$.blockUI({ -->
+                <!--message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",-->
+                <!--css : {-->
+                    <!--backgroundColor : 'rgba(0,0,0,0.0)',-->
+                    <!--color : '#000000',-->
+                    <!--border: '0px solid #a00'-->
+                <!--}-->
+            <!--});-->
+            
+            $.ajax({
+                    type : 'POST',
+                    method: 'POST',
+                    url : '/testCamModel/',
+                    processData: false,
+                    contentType: false,                 
+                    data : formData,
+                    }).done(function(response) {
+                        // alert(response);
+
+                        <!--$.unblockUI();-->
+                    }).always(function() {
+                    	<!--$.unblockUI();-->
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        <!--$.unblockUI();-->
+                    });            
+        });
+
+        $('#model').val('SSD').trigger('change');
+
+        <!--initCam();-->
+
+    });
+
+function initCam(){
+
+    var video = document.querySelector("#videoElement");
+
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({video: true})
+      .then(function(stream) {
+        video.srcObject = stream;
+      })
+      .catch(function(error) {
+        console.log("Something went wrong!");
+        console.log(error);
+      });
+}
+
+}
+
+</script>
+<style>
+.file {
+  visibility: hidden;
+  position: absolute;
+}
+
+#container {
+    margin: 0px auto;
+    width: 500px;
+    height: 375px;
+    border: 10px #333 solid;
+}
+#videoElement {
+    width: 500px;
+    height: 375px;
+    background-color: #666;
+}
+</style>
+<div class="container">
+    <div class="row">
+    	<form action='/testModel/' method="post" id="testForm">{% csrf_token %}
+    		<input type="hidden" id="child" name="child" />
+    		<input type="hidden" id="ckpt" name="ckpt" />
+    	</form>
+    	<form action = "/getModelChild" method="get" id="getModelChildForm" >
+    		
+    		<div class="col-sm-3">
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <select class="form-control" name="model" id="model">
+                        <option selected="selected" value='SSD'>SSD Mobilenet</option>
+                        <option value='FRCNN'>F-RCNN</option>
+                        <option value='YOLOV2'>YOLO v2</option>
+                    </select>                    
+                </div>                
+            </div>
+            <div class="col-sm-3">
+            	<div class="form-group">
+            		<label for="modelchild">Trained Model</label>
+                    <select class="form-control" name="modelchild" id="modelchild">
+                        <option selected="selected" value=''>--</option>                        
+                    </select>
+                </div>	
+            </div>
+            <div class="col-sm-3">
+            	<div class="form-group">
+            		<label for="modelckpt">Model Checkpoint</label>
+                    <select class="form-control" name="modelckpt" id="modelckpt">
+                        <option selected="selected" value=''>--</option>                        
+                    </select>
+                </div>	
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <form action = "/testDataForm/" method="post" id="testDataForm" enctype="multipart/form-data">
+
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="export">　</label>
+                    <button type="button" class="btn btn-danger btn-block" id="export" name="export">Desktop Test</button>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label for="doTest">　</label>
+                    <button type="button" class="btn btn-danger btn-block" id="doTest" name="doTest">Cam Test</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div>
+
+        <video autoplay="true" id="videoElement">
+
+        </video>
+	    <div id="resultview" style="border: 1px; border-color: #00bb22; width:90%;">
+	    </div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+{% endblock %}

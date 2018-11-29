@@ -41,7 +41,7 @@ PATH_TO_FROZEN_GRAPH = 'c:/hsnc_od/salesweb/main/object_detection/images/{}/trai
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('c:\hsnc_od\salesweb\main\object_detection\images\{}'.format(sys.argv[1]), 'train.pbtxt')
 
-NUM_CLASSES = 1
+NUM_CLASSES = 2
 
 detection_graph = tf.Graph()
 with detection_graph.as_default():

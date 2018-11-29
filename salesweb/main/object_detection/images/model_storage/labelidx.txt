@@ -1,0 +1,1 @@
+[{"IDX": 1, "LABEL": "storage"}, {"IDX":2, "LABEL": "hdd"}]

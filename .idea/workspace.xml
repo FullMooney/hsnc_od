@@ -12,53 +12,50 @@
     <session id="1114719477">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="6" />
+          <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.14" value="1" />
           <entry key="project.open.time.15" value="1" />
           <entry key="project.open.time.20" value="1" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.open.time.27" value="1" />
+          <entry key="project.opened" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="2112" />
+          <entry key="html" value="92" />
+          <entry key="py" value="3230" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2112" />
+          <entry key="HTML" value="92" />
+          <entry key="Python" value="3230" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="html" value="1" />
-          <entry key="ipynb" value="1" />
+          <entry key="html" value="5" />
+          <entry key="ipynb" value="4" />
+          <entry key="py" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="HTML" value="1" />
-          <entry key="IPNB" value="1" />
+          <entry key="HTML" value="5" />
+          <entry key="IPNB" value="4" />
+          <entry key="Python" value="4" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/salesweb/settings.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1311">
-              <caret line="69" selection-start-line="69" selection-end-line="69" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/salesweb/main/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="446">
-              <caret line="322" column="16" lean-forward="true" selection-start-line="322" selection-start-column="16" selection-end-line="322" selection-end-column="16" />
+            <state relative-caret-position="845">
+              <caret line="544" lean-forward="true" selection-start-line="544" selection-end-line="544" />
               <folding>
                 <element signature="e#25#79#0" expanded="true" />
               </folding>
@@ -67,24 +64,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/generate_tfrecord.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/train.py">
+        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_cam_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1672">
-              <caret line="99" column="58" selection-start-line="99" selection-start-column="58" selection-end-line="99" selection-end-column="58" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3021">
-              <caret line="171" column="100" selection-start-line="171" selection-start-column="100" selection-end-line="171" selection-end-column="100" />
+            <state relative-caret-position="-1720">
+              <caret line="24" column="10" lean-forward="true" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
               <folding>
                 <element signature="e#438#481#0" expanded="true" />
               </folding>
@@ -93,19 +76,52 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testModel.html">
+        <entry file="file://$PROJECT_DIR$/salesweb/main/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2907">
-              <caret line="153" column="93" selection-start-line="153" selection-start-column="93" selection-end-line="153" selection-end-column="93" />
+            <state relative-caret-position="171">
+              <caret line="9" column="45" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="45" />
+              <folding>
+                <element signature="e#24#56#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_jjvcustom_ssd_for_web.ipynb">
-          <provider selected="true" editor-type-id="ipnb-editor">
-            <state>
-              <selected id="24" />
+        <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testModel.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="498">
+              <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testCamModel.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="417">
+              <caret line="191" column="34" lean-forward="true" selection-start-line="191" selection-start-column="34" selection-end-line="191" selection-end-column="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/salesweb/main/templates/core/base.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1140">
+              <caret line="60" column="50" selection-start-line="60" selection-start-column="50" selection-end-line="60" selection-end-column="50" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="474">
+              <caret line="167" column="2" lean-forward="true" selection-start-line="167" selection-start-column="2" selection-end-line="168" selection-end-column="28" />
+              <folding>
+                <element signature="e#438#481#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -152,6 +168,18 @@
     <findStrings>
       <find>cx_Or</find>
       <find>method</find>
+      <find>response</find>
+      <find>get(</find>
+      <find>shortcut</find>
+      <find>subprocess</find>
+      <find>load_image_into_numpy_array</find>
+      <find>initCam</find>
+      <find>subpro</find>
+      <find>arg</find>
+      <find>graph</find>
+      <find>image_np_expanded</find>
+      <find>ret</find>
+      <find>frame</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -162,14 +190,20 @@
       <list>
         <option value="$PROJECT_DIR$/salesweb/main/models.py" />
         <option value="$PROJECT_DIR$/salesweb/salesweb/settings.py" />
+        <option value="$PROJECT_DIR$/salesweb/main/templates/core/base.html" />
+        <option value="$PROJECT_DIR$/salesweb/main/object_detection/object_detection_tutorial_Webcam_1.ipynb" />
         <option value="$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py" />
+        <option value="$PROJECT_DIR$/salesweb/main/object_detection/object_detection_tutorial_Webcam_1.py" />
+        <option value="$PROJECT_DIR$/salesweb/main/urls.py" />
+        <option value="$PROJECT_DIR$/salesweb/main/object_detection/object_detection_cam_test.py" />
+        <option value="$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testCamModel.html" />
         <option value="$PROJECT_DIR$/salesweb/main/views.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="91" />
-    <option name="y" value="84" />
+    <option name="x" value="2248" />
+    <option name="y" value="470" />
     <option name="width" value="1306" />
     <option name="height" value="1003" />
   </component>
@@ -203,7 +237,22 @@
               <item name="hsnc_od" type="462c0819:PsiDirectoryNode" />
               <item name="salesweb" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="object_detection" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="hsnc_od" type="b2602c69:ProjectViewProjectNode" />
+              <item name="hsnc_od" type="462c0819:PsiDirectoryNode" />
+              <item name="salesweb" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="hsnc_od" type="b2602c69:ProjectViewProjectNode" />
+              <item name="hsnc_od" type="462c0819:PsiDirectoryNode" />
+              <item name="salesweb" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="hsnc_od" type="b2602c69:ProjectViewProjectNode" />
@@ -234,6 +283,12 @@
       </pane>
     </panes>
   </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\hsnc_od\salesweb\main\object_detection" />
+      <recent name="C:\hsnc_od\salesweb\main\templates\main\object_detection" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -260,10 +315,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1874" height="1096" extended-state="6" />
-    <editor active="true" />
+    <frame x="1912" y="-8" width="1936" height="1096" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18518518" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17913593" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -303,27 +357,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3021">
-          <caret line="171" column="100" selection-start-line="171" selection-start-column="100" selection-end-line="171" selection-end-column="100" />
-          <folding>
-            <element signature="e#438#481#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testModel.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2907">
-          <caret line="153" column="93" selection-start-line="153" selection-start-column="93" selection-end-line="153" selection-end-column="93" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_jjvcustom_ssd_for_web.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
           <selected id="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/templates/core/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1140">
+          <caret line="60" column="50" selection-start-line="60" selection-start-column="50" selection-end-line="60" selection-end-column="50" />
         </state>
       </provider>
     </entry>
@@ -357,10 +401,75 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/tensorflow/python/framework/ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="2783" column="68" lean-forward="true" selection-start-line="2783" selection-start-column="68" selection-end-line="2783" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_tutorial_Webcam_1.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_tutorial_Webcam_1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="873">
+          <caret line="115" selection-start-line="115" selection-end-line="115" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testModel.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="498">
+          <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="9" column="45" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="45" />
+          <folding>
+            <element signature="e#24#56#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_cam_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1720">
+          <caret line="24" column="10" lean-forward="true" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+          <folding>
+            <element signature="e#438#481#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/object_detection/object_detection_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="474">
+          <caret line="167" column="2" lean-forward="true" selection-start-line="167" selection-start-column="2" selection-end-line="168" selection-end-column="28" />
+          <folding>
+            <element signature="e#438#481#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/salesweb/main/templates/main/object_detection/testCamModel.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="417">
+          <caret line="191" column="34" lean-forward="true" selection-start-line="191" selection-start-column="34" selection-end-line="191" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/salesweb/main/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="322" column="16" lean-forward="true" selection-start-line="322" selection-start-column="16" selection-end-line="322" selection-end-column="16" />
+        <state relative-caret-position="845">
+          <caret line="544" lean-forward="true" selection-start-line="544" selection-end-line="544" />
           <folding>
             <element signature="e#25#79#0" expanded="true" />
           </folding>

@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.conf.urls import url
-from main.views import index, trainModel, manageModel, getModels, ModelCkpt, graphExport
+from main.views import index, trainModel, manageModel, getModels, ModelCkpt, graphExport, testCamModel
 
 app_name = 'main'
 urlpatterns = [
@@ -25,7 +25,12 @@ urlpatterns = [
     url(r'^ModelChild$', ModelCkpt.getModelChild),
 
     # Get model-ckp t
-    url(r'^ModelCkpt$', ModelCkpt.getModelCkpt)
+    url(r'^ModelCkpt$', ModelCkpt.getModelCkpt),
+
+    # cam Testing.
+    url(r'^testCamModel', testCamModel.as_view()),
+
+    # url(r'^testCamlive$', testCamModel.as_view()),
 
 ]
 
