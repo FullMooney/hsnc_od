@@ -363,10 +363,10 @@ class testCamModel(TemplateView):
 
         child = request.POST['child']
         ckpt = request.POST['ckpt']
+        typecd = request.POST['typecd']
 
         image_path = 'c:/hsnc_od/salesweb/main/object_detection/images/'
-        # image_path = settings.CKPT_ROOT
-        # print(image_path)
+
         child_path = image_path + child
         train_graph_path = child_path + '/train_graph'
         # train_graph export
@@ -389,7 +389,6 @@ class testCamModel(TemplateView):
         ## 테스트 이미지 파일은 경로는 시간으로 분리해서 저장시켜놓고 테스트 시키자, Subprocess 에 경로만 넘겨줌
         ## 파일 경로에 있는 이미지 파일 들은 서브프로세스에서 od 한 결과 이미지로 파일 바꾸자
         print('----------object_detection test started--------------')
-        files = request.FILES.getlist('files')
         nowtime = datetime.now().strftime('%y%m%d%H%M%S')
         staticImgPath = '/static/img/test/{}/{}'.format(child, nowtime)
 
@@ -399,6 +398,7 @@ class testCamModel(TemplateView):
 
 
         sys.path.append("..")
+
         from object_detection.utils import ops as utils_ops
 
         if StrictVersion(tf.__version__) < StrictVersion('1.9.0'):
@@ -492,58 +492,136 @@ class testCamModel(TemplateView):
                     output_dict['detection_masks'] = output_dict['detection_masks'][0]
             return output_dict
 
+        def save_result_model(child, label):
+            pass
+
         with detection_graph.as_default():
             with tf.Session(graph=detection_graph) as sess:
+
                 ret = True
                 # cap = cv2.VideoCapture(0)
-                fourcc = cv2.VideoWriter_fourcc(*'XVID')
-                out = cv2.VideoWriter("output.avi", fourcc, 5.0, (1366, 768))
-                while (ret):
-                    # ret, image_np = cap.read()
-                    img = ImageGrab.grab()
-                    image_np = np.array(img)
-                    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                    # image_np_expanded = np.expand_dims(image_np, axis=0)
-                    # Actual detection.
-                    tmp_np = image_np
-                    output_dict = run_inference_for_single_image(image_np, detection_graph)
-                    # Visualization of the results of a detection.
+                # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                # out = cv2.VideoWriter("output.avi", fourcc, 5.0, (1366, 768))
 
-                    vis_util.visualize_boxes_and_labels_on_image_array(
-                        image_np,
-                        output_dict['detection_boxes'],
-                        output_dict['detection_classes'],
-                        output_dict['detection_scores'],
-                        category_index,
-                        instance_masks=output_dict.get('detection_masks'),
-                        use_normalized_coordinates=True,
-                        line_thickness=8)
-                    # print(output_dict['detection_scores'])
+                if typecd == '1':
+                    while (ret):
+                        img = ImageGrab.grab()
+                        image_np = np.array(img)
 
-                    frame = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-                    for detected in output_dict['detection_scores']:
-                        if detected >= 0.80:
-                            frame = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-                    cv2.imshow('live_detection', frame)
+                        output_dict = run_inference_for_single_image(image_np, detection_graph)
+                        # Visualization of the results of a detection.
+                        vis_util.visualize_boxes_and_labels_on_image_array(
+                            image_np,
+                            output_dict['detection_boxes'],
+                            output_dict['detection_classes'],
+                            output_dict['detection_scores'],
+                            category_index,
+                            instance_masks=output_dict.get('detection_masks'),
+                            use_normalized_coordinates=True,
+                            line_thickness=8)
+                        # print(output_dict['detection_scores'])
 
-                    # frame = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-                    # cv2.imshow('live_detection', frame)
-                    out.write(frame)
-                    if cv2.waitKey(25) & 0xFF == ord('q'):
-                        out.release()
-                        cv2.destroyAllWindows()
-                        break
+                        frame = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+                        cv2.imshow('live_detection', frame)
+
+                        if cv2.waitKey(25) & 0xFF == ord('c'):
+                            cap_date = datetime.now().strftime('%y%m%d')
+                            cap_time = datetime.now().strftime('%H%M%S')
+                            cap_dir = "C:/hsnc_od/salesweb/main/object_detection/images/{}".format(cap_date)
+                            if not os.path.exists(cap_dir):
+                                os.makedirs(cap_dir)
+
+                            cap_path = cap_dir + "/{}.png".format(cap_time)
+
+                            cv2.imwrite(cap_path,image_np)
+                            print("---- {}  saved--".format(cap_path))
+
+                            print('saving resultmodel-------')
+                            idx = 0
+                            for detected in output_dict['detection_scores']:
+                                if detected >= 0.80:
+                                    print("====over 80%==== saving start")
+                                    
+                            # postgres
+                                    ip, is_routable = get_client_ip(request)
+                                    X = np.array(output_dict['detection_boxes'][idx]).astype(float)
+                                    px = float("%0.2f"%(X[0]))
+                                    py = float("%0.2f"%(X[1]))
+                                    width = float("%0.2f"%(X[2]))
+                                    height = float("%0.2f"%(X[3]))
+                                    detected = float(np.array(detected).astype(float))
+
+                                    newResultModel = ResultModel.objects.create(
+                                        methodname="SSD",
+                                        modelname=child,
+                                        datetime="{}{}".format(cap_date, cap_time),
+                                        filename="{}.png".format(cap_time),
+                                        px=px,
+                                        py=py,
+                                        width=width,
+                                        height=height,
+                                        image_path=cap_path,
+                                        hit_yn='Y',
+                                        ip=ip,
+                                        label=category_index[output_dict['detection_classes'][idx]].get('name'),
+                                        score=detected
+                                    )
+                                    newResultModel.save()
+                                    # oracle S
+                                    print("oracle-----")
 
 
+                                    # oracle E
+                                    idx +=1
+                            print('-------saving resultmodel')
 
 
-        # testProc = subprocess.Popen(["python", BASE_DIR + '/main/object_detection/object_detection_cam_test.py'] + args,
-        #                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # testProc.wait()
-        # output, stderr = testProc.communicate()
-        # outarr = output.decode('utf-8').splitlines()
+                        if cv2.waitKey(25) & 0xFF == ord('q'):
+                            # out.release()
+                            cv2.destroyAllWindows()
+                            break
+                else:
+                    while (ret):
+                        cap = cv2.VideoCapture(0)
+                        ret, image_np = cap.read()
+                        image_np_expanded = np.expand_dims(image_np, axis=0)
 
-        # print(outarr)
+                        output_dict = run_inference_for_single_image(image_np, detection_graph)
+                        # Visualization of the results of a detection.
+
+                        vis_util.visualize_boxes_and_labels_on_image_array(
+                            image_np,
+                            output_dict['detection_boxes'],
+                            output_dict['detection_classes'],
+                            output_dict['detection_scores'],
+                            category_index,
+                            instance_masks=output_dict.get('detection_masks'),
+                            use_normalized_coordinates=True,
+                            line_thickness=8)
+
+                        cv2.imshow('cam_detection', cv2.resize(image_np, (800,600)))
+
+                        # frame = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+                        # cv2.imshow('live_detection', frame)
+
+
+                        if cv2.waitKey(25) & 0xFF == ord('c'):
+                            cap_date = datetime.now().strftime('%y%m%d')
+                            cap_time = datetime.now().strftime('%H%M%S')
+                            cap_dir = "C:/hsnc_od/salesweb/main/object_detection/images/{}".format(cap_date)
+                            if not os.path.exists(cap_dir):
+                                os.makedirs(cap_dir)
+
+                            cap_path = cap_dir + "/{}.png".format(cap_time)
+
+                            cv2.imwrite(cap_path, image_np)
+                            print("---- {}  saved--".format(cap_path))
+
+                        if cv2.waitKey(25) & 0xFF == ord('q'):
+                            cv2.destroyAllWindows()
+                            break
+
+
 
 
         print('---------object_detection test done---------------')

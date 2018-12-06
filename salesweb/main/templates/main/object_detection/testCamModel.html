@@ -73,6 +73,7 @@ Hanwha
         $('#export').click(function(event) {
         	formData.append('child', $('#modelchild').val());
             formData.append('ckpt', $('#modelckpt').val());
+            formData.append('typecd', '1');
             //masking
             <!--$.blockUI({ -->
                 <!--message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",-->
@@ -100,6 +101,39 @@ Hanwha
                         alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
                         <!--$.unblockUI();-->
                     });            
+        });
+
+        $('#doTest').click(function(event) {
+        	formData.append('child', $('#modelchild').val());
+            formData.append('ckpt', $('#modelckpt').val());
+            formData.append('typecd', '2');
+            //masking
+            <!--$.blockUI({ -->
+                <!--message : "<img src='{% static 'img/preloader/preloader_110.png'%}'/>",-->
+                <!--css : {-->
+                    <!--backgroundColor : 'rgba(0,0,0,0.0)',-->
+                    <!--color : '#000000',-->
+                    <!--border: '0px solid #a00'-->
+                <!--}-->
+            <!--});-->
+
+            $.ajax({
+                    type : 'POST',
+                    method: 'POST',
+                    url : '/testCamModel/',
+                    processData: false,
+                    contentType: false,
+                    data : formData,
+                    }).done(function(response) {
+                        // alert(response);
+
+                        <!--$.unblockUI();-->
+                    }).always(function() {
+                    	<!--$.unblockUI();-->
+                    }).error(function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        <!--$.unblockUI();-->
+                    });
         });
 
         $('#model').val('SSD').trigger('change');
@@ -149,6 +183,7 @@ function initCam(){
     	<form action='/testModel/' method="post" id="testForm">{% csrf_token %}
     		<input type="hidden" id="child" name="child" />
     		<input type="hidden" id="ckpt" name="ckpt" />
+            <input type="hidden" id="typecd" name="typecd" />
     	</form>
     	<form action = "/getModelChild" method="get" id="getModelChildForm" >
     		
@@ -199,9 +234,9 @@ function initCam(){
     </div>
     <div>
 
-        <video autoplay="true" id="videoElement">
+        <!--<video autoplay="true" id="videoElement">-->
 
-        </video>
+        <!--</video>-->
 	    <div id="resultview" style="border: 1px; border-color: #00bb22; width:90%;">
 	    </div>
 	</div>
