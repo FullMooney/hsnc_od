@@ -31,8 +31,8 @@ from django.core import serializers
 from os import listdir
 from os.path import isfile, join
 from shutil import copyfile, copy2, rmtree
-from ipware import get_client_ip
-import cx_Oracle
+# from ipware import get_client_ip
+# import cx_Oracle
 
 from distutils.version import StrictVersion
 import numpy as np
@@ -320,7 +320,7 @@ class graphExport(TemplateView):
             # postgres
             outarr_dict = ast.literal_eval(dat)
             print(outarr_dict)
-            ip, is_routable = get_client_ip(request)
+            # ip, is_routable = get_client_ip(request)
             newResultModel = ResultModel.objects.create(
                 methodname="SSD",
                 modelname=child,
@@ -332,7 +332,7 @@ class graphExport(TemplateView):
                 height=outarr_dict.get('ymax'),
                 image_path=outarr_dict.get('image_path'),
                 hit_yn='Y',
-                ip=ip,
+                ip="127.0.0.1",
                 label=outarr_dict.get('class'),
                 score=outarr_dict.get('score')
             )
@@ -543,7 +543,7 @@ class testCamModel(TemplateView):
                                     print("====over 80%==== saving start")
                                     
                             # postgres
-                                    ip, is_routable = get_client_ip(request)
+                                    # ip, is_routable = get_client_ip(request)
                                     X = np.array(output_dict['detection_boxes'][idx]).astype(float)
                                     px = float("%0.2f"%(X[0]))
                                     py = float("%0.2f"%(X[1]))
@@ -562,7 +562,7 @@ class testCamModel(TemplateView):
                                         height=height,
                                         image_path=cap_path,
                                         hit_yn='Y',
-                                        ip=ip,
+                                        ip="127.0.0.1",
                                         label=category_index[output_dict['detection_classes'][idx]].get('name'),
                                         score=detected
                                     )
